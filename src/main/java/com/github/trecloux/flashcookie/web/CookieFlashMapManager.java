@@ -1,8 +1,6 @@
 package com.github.trecloux.flashcookie.web;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -13,17 +11,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.codehaus.jackson.JsonGenerator;
-import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.JsonProcessingException;
-import org.codehaus.jackson.JsonToken;
 import org.codehaus.jackson.Version;
-import org.codehaus.jackson.map.DeserializationContext;
-import org.codehaus.jackson.map.JsonDeserializer;
 import org.codehaus.jackson.map.JsonSerializer;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializerProvider;
 import org.codehaus.jackson.map.module.SimpleModule;
-import org.springframework.core.serializer.Deserializer;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.FlashMap;
 import org.springframework.web.servlet.support.AbstractFlashMapManager;
@@ -38,7 +31,6 @@ public class CookieFlashMapManager extends AbstractFlashMapManager {
 	public CookieFlashMapManager() {
 		 SimpleModule module =  new SimpleModule("FlahsMapSerializerModule",  new Version(1, 0, 0, null));
 		 module.addSerializer(new FlashMapSerializer());
-		 module.addDeserializer(FlashMap.class, new FlashMapDeserializer());
 		 objectMapper.registerModule(module);
 	}
 
@@ -111,18 +103,5 @@ public class CookieFlashMapManager extends AbstractFlashMapManager {
 			return FlashMap.class;
 		}
 		
-	}
-	
-	public class FlashMapDeserializer extends JsonDeserializer<FlashMap> {
-
-		@Override
-		public FlashMap deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException,
-				JsonProcessingException {
-			JsonToken nextToken = jp.nextValue();
-			return null;
-		}
-
-		
-
 	}	
 }

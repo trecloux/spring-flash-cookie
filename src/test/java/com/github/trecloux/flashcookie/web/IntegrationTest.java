@@ -1,8 +1,8 @@
 package com.github.trecloux.flashcookie.web;
 
 import net.sourceforge.jwebunit.junit.WebTester;
-import net.sourceforge.jwebunit.util.TestingEngineRegistry;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mortbay.jetty.Connector;
@@ -14,6 +14,7 @@ public class IntegrationTest extends WebTester {
 	
 	private static final String WEBAPP = "src/main/webapp/";
 	private static final String CONTEXTPATH = "/";
+	private Server server;
 
 	
 	@Test
@@ -38,7 +39,7 @@ public class IntegrationTest extends WebTester {
 	
 	@Before
 	public void startSever() throws Exception {
-		Server server = new Server();
+		server = new Server();
 		Connector connector = new SelectChannelConnector();
 		connector.setPort(8080);
 		connector.setHost("0.0.0.0");
@@ -52,6 +53,11 @@ public class IntegrationTest extends WebTester {
 		server.setStopAtShutdown(true);
 
 		server.start();
+	}
+	
+	@After
+	public void stopServer() throws Exception {
+		server.stop();
 	}
 
 }

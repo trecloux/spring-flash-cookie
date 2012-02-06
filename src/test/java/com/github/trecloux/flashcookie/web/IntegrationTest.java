@@ -38,7 +38,7 @@ public class IntegrationTest extends WebTester {
 	
 	
 	@Before
-	public void startSever() throws Exception {
+	public void startServer() throws Exception {
 		server = new Server();
 		Connector connector = new SelectChannelConnector();
 		connector.setPort(8080);

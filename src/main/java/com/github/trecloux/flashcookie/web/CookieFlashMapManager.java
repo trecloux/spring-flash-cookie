@@ -11,7 +11,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.codehaus.jackson.JsonGenerator;
-import org.codehaus.jackson.JsonProcessingException;
 import org.codehaus.jackson.Version;
 import org.codehaus.jackson.map.JsonSerializer;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -22,16 +21,29 @@ import org.springframework.web.servlet.FlashMap;
 import org.springframework.web.servlet.support.AbstractFlashMapManager;
 import org.springframework.web.util.WebUtils;
 
+/**
+ * Cookie based FlashMapManager.
+ * Stores the FlashMap in a cookie name "FLASH" as JSON encoded data.
+ * @author Thomas Recloux 
+ */
 @Component("flashMapManager")
 public class CookieFlashMapManager extends AbstractFlashMapManager {
 
 	private static final String COOKIE_NAME = "FLASH";
+	private static final String MAP_ATTR = "map";
+	private static final String REQUEST_PATH_ATTR = "targetRequestPath";
+	private static final String ENCODING = "UTF-8";
+	
 	private ObjectMapper objectMapper = new ObjectMapper();
 	
 	public CookieFlashMapManager() {
-		 SimpleModule module =  new SimpleModule("FlahsMapSerializerModule",  new Version(1, 0, 0, null));
-		 module.addSerializer(new FlashMapSerializer());
-		 objectMapper.registerModule(module);
+		 initCustomSerializer();
+	}
+
+	protected void initCustomSerializer() {
+		SimpleModule module =  new SimpleModule("FlahsMapSerializerModule",  new Version(1, 0, 0, null));
+		module.addSerializer(new FlashMapSerializer());
+		objectMapper.registerModule(module);
 	}
 
 	@Override
@@ -44,6 +56,31 @@ public class CookieFlashMapManager extends AbstractFlashMapManager {
 			return decodeFlashMaps(encodedValue);
 		}
 	}
+	
+	@SuppressWarnings("unchecked")
+	protected List<FlashMap> decodeFlashMaps(String base64EncodedValue) {
+		try {
+			byte[] data = Base64.decode(base64EncodedValue);
+			String stringEncodedValue = new String(data, ENCODING);
+			List<Map<String, Object>> maps = objectMapper.readValue(stringEncodedValue, List.class);
+			List<FlashMap> flashMaps = rebuildFlashMap(maps);
+			return flashMaps;
+		} catch (IOException e) {
+			throw new RuntimeException("Error decoding flash map", e);
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	private List<FlashMap> rebuildFlashMap(List<Map<String, Object>> maps) {
+		List<FlashMap> flashMaps = new ArrayList<FlashMap>();
+		for (Map<String, Object> map : maps) {
+			FlashMap flashMap = new FlashMap();
+			flashMap.setTargetRequestPath((String) map.get(REQUEST_PATH_ATTR));
+			flashMap.putAll((Map<String, Object>) map.get(MAP_ATTR));
+			flashMaps.add(flashMap);
+		}
+		return flashMaps;
+	}
 
 	@Override
 	protected void updateFlashMaps(List<FlashMap> flashMaps, HttpServletRequest request, HttpServletResponse response) {
@@ -52,50 +89,29 @@ public class CookieFlashMapManager extends AbstractFlashMapManager {
 		response.addCookie(cookie);
 	}
 
-	private String encodeFlashMaps(List<FlashMap> flashMap) {
+	protected String encodeFlashMaps(List<FlashMap> flashMap) {
 		try {
 			String encodedValue = objectMapper.writeValueAsString(flashMap);
-			byte[] data = encodedValue.getBytes("UTF-8");
+			byte[] data = encodedValue.getBytes(ENCODING);
 			return Base64.encodeToString(data, false);
 		} catch (IOException e) {
 			throw new RuntimeException("Error encoding flash map", e);
 		}
 	}
 
-	@SuppressWarnings("unchecked")
-	protected List<FlashMap> decodeFlashMaps(String encodedValue) {
-		try {
-			byte[] data = Base64.decode(encodedValue);
-			encodedValue = new String(data, "UTF-8");
-			List<Map<String, Object>> maps = objectMapper.readValue(encodedValue, List.class);
-			List<FlashMap> flashMaps = new ArrayList<FlashMap>();
-			for (Map<String, Object> map : maps) {
-				FlashMap flashMap = new FlashMap();
-				flashMap.setTargetRequestPath((String) map.get("targetRequestPath"));
-				flashMap.putAll((Map<String, Object>) map.get("map"));
-				flashMaps.add(flashMap);
-			}
-			
-			return flashMaps;
-		} catch (IOException e) {
-			throw new RuntimeException("Error decoding flash map", e);
-		}
-	}
 	
-	public class FlashMapSerializer extends JsonSerializer<FlashMap> {
+	/*
+	 * Custom JSON Serialiser of the FlasMap.
+	 * Flashmap extends java.util.Map and Jackson does not encode specific attributes.   
+	 */
+	private class FlashMapSerializer extends JsonSerializer<FlashMap> {
 
 		@Override
-		public void serialize(FlashMap flashMap, JsonGenerator jgen, SerializerProvider serializerProvider) throws IOException,
-				JsonProcessingException {
-			
+		public void serialize(FlashMap flashMap, JsonGenerator jgen, SerializerProvider serializerProvider) throws IOException {
 			jgen.writeStartObject();
-			jgen.writeStringField("targetRequestPath", flashMap.getTargetRequestPath());
-			HashMap<String, Object> map = new HashMap<String, Object>();
-			map.putAll(flashMap);
-			serializerProvider.defaultSerializeField("map", map, jgen);
+			jgen.writeStringField(REQUEST_PATH_ATTR, flashMap.getTargetRequestPath());
+			serializerProvider.defaultSerializeField(MAP_ATTR, new HashMap<String, Object>(flashMap), jgen);
 			jgen.writeEndObject();
-		
-			
 		}
 
 		@Override

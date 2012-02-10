@@ -14,6 +14,6 @@
   
 <!--   <logger name="org.springframework.security" level="debug"/> -->
 <!--   <logger name="org.springframework.web" level="trace"/> -->
- 	<logger name="com.gitbug.trecloux" level="debug"/>
+ 	<logger name="com.github.trecloux" level="trace"/>
 
 </configuration>

@@ -88,14 +88,8 @@ public class CookieFlashMapManager extends AbstractFlashMapManager {
 	protected String encodeFlashMaps(List<FlashMap> flashMaps) {
 		try {
 			
-			List<Map<String,Object>> disassambledFlashMaps = new ArrayList<Map<String,Object>>();
-			for (FlashMap flashMap : flashMaps) {
-				Map<String,Object> disassambledFlashMap = new HashMap<String, Object>();
-				disassambledFlashMap.put(REQUEST_PATH_ATTR, flashMap.getTargetRequestPath());
-				disassambledFlashMap.put(MAP_ATTR, new HashMap<String, Object>(flashMap));
-				disassambledFlashMaps.add(disassambledFlashMap);
-			}
-			String encodedValue = objectMapper.writeValueAsString(disassambledFlashMaps);
+			List<Map<String, Object>> disassembledFlashMaps = disassembleFlashMaps(flashMaps);
+			String encodedValue = objectMapper.writeValueAsString(disassembledFlashMaps);
 			logger.trace("JSon encoded FlashMap : {}", encodedValue);
 			byte[] data = encodedValue.getBytes(ENCODING);
 			String base64Encoded = Base64.encodeToString(data, false);
@@ -104,5 +98,16 @@ public class CookieFlashMapManager extends AbstractFlashMapManager {
 		} catch (IOException e) {
 			throw new RuntimeException("Error encoding flash map", e);
 		}
+	}
+
+	private List<Map<String, Object>> disassembleFlashMaps(List<FlashMap> flashMaps) {
+		List<Map<String,Object>> disassembledFlashMaps = new ArrayList<Map<String,Object>>();
+		for (FlashMap flashMap : flashMaps) {
+			Map<String,Object> disassembledFlashMap = new HashMap<String, Object>();
+			disassembledFlashMap.put(REQUEST_PATH_ATTR, flashMap.getTargetRequestPath());
+			disassembledFlashMap.put(MAP_ATTR, new HashMap<String, Object>(flashMap));
+			disassembledFlashMaps.add(disassembledFlashMap);
+		}
+		return disassembledFlashMaps;
 	}
 }

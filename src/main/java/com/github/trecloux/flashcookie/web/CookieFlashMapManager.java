@@ -1,15 +1,6 @@
 package com.github.trecloux.flashcookie.web;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import org.apache.commons.codec.binary.Base64;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.ObjectMapper.DefaultTyping;
 import org.slf4j.Logger;
@@ -18,6 +9,15 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.FlashMap;
 import org.springframework.web.servlet.support.AbstractFlashMapManager;
 import org.springframework.web.util.WebUtils;
+
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -56,7 +56,7 @@ public class CookieFlashMapManager extends AbstractFlashMapManager {
 	@SuppressWarnings("unchecked")
 	protected List<FlashMap> decodeFlashMaps(String base64EncodedValue) {
 		try {
-			byte[] data = Base64.decode(base64EncodedValue);
+			byte[] data = Base64.decodeBase64(base64EncodedValue);
 			String stringEncodedValue = new String(data, ENCODING);
 			List<Map<String, Object>> maps = objectMapper.readValue(stringEncodedValue, List.class);
 			List<FlashMap> flashMaps = rebuildFlashMap(maps);
@@ -92,7 +92,7 @@ public class CookieFlashMapManager extends AbstractFlashMapManager {
 			String encodedValue = objectMapper.writeValueAsString(disassembledFlashMaps);
 			logger.trace("JSon encoded FlashMap : {}", encodedValue);
 			byte[] data = encodedValue.getBytes(ENCODING);
-			String base64Encoded = Base64.encodeToString(data, false);
+			String base64Encoded = Base64.encodeBase64String(data);
 			logger.trace("Base64 encoded FlashMap size : {}", base64Encoded.length());
 			return base64Encoded;
 		} catch (IOException e) {

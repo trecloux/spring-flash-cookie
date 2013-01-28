@@ -35,7 +35,13 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-		<dependency>
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+            <version>1.7</version>
+        </dependency>
+
+        <dependency>
 			<groupId>org.mortbay.jetty</groupId>
 			<artifactId>jetty</artifactId>
 			<version>6.1.14</version>
@@ -117,17 +123,17 @@
 			<version>2.5</version>
 			<scope>provided</scope>
 		</dependency>
-		<!-- <dependency> -->
-		<!-- <groupId>javax.servlet.jsp</groupId> -->
-		<!-- <artifactId>jsp-api</artifactId> -->
-		<!-- <version>2.1</version> -->
-		<!-- <scope>provided</scope> -->
-		<!-- </dependency> -->
-		<!-- <dependency> -->
-		<!-- <groupId>javax.servlet</groupId> -->
-		<!-- <artifactId>jstl</artifactId> -->
-		<!-- <version>1.2</version> -->
-		<!-- </dependency> -->
+		 <dependency>
+		 <groupId>javax.servlet.jsp</groupId>
+		 <artifactId>jsp-api</artifactId>
+		 <version>2.1</version>
+		 <scope>provided</scope>
+		 </dependency>
+		 <dependency>
+		 <groupId>javax.servlet</groupId>
+		 <artifactId>jstl</artifactId>
+		 <version>1.2</version>
+		 </dependency>
 	</dependencies>
 
 

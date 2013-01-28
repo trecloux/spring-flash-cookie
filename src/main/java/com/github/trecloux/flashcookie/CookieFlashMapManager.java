@@ -5,7 +5,6 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.ObjectMapper.DefaultTyping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.FlashMap;
 import org.springframework.web.servlet.support.AbstractFlashMapManager;
 import org.springframework.web.util.WebUtils;
@@ -26,7 +25,6 @@ import java.util.Map;
  * 
  * @author Thomas Recloux
  */
-@Component("flashMapManager")
 public class CookieFlashMapManager extends AbstractFlashMapManager {
 
 	private static final String COOKIE_NAME = "FLASH";

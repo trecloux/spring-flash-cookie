@@ -16,6 +16,8 @@
 	</beans:bean>
 	
 	<context:component-scan base-package="com.github.trecloux.flashcookie.web" />
+
+    <beans:bean class="com.github.trecloux.flashcookie.CookieFlashMapManager" />
 	
 		
 </beans:beans>

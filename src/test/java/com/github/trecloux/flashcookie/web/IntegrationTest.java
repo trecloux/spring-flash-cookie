@@ -12,7 +12,7 @@ import org.mortbay.jetty.webapp.WebAppContext;
 
 public class IntegrationTest extends WebTester {
 	
-	private static final String WEBAPP = "src/main/webapp/";
+	private static final String WEBAPP = "src/test/webapp/";
 	private static final String CONTEXTPATH = "/";
 	private Server server;
 

@@ -4,13 +4,14 @@
 	<groupId>com.github.trecloux</groupId>
 	<artifactId>spring-flash-cookie</artifactId>
 	<version>0.1-SNAPSHOT</version>
-	<packaging>war</packaging>
+	<packaging>jar</packaging>
 
 	<name>${project.artifactId}</name>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<spring.version>3.1.2.RELEASE</spring.version>
+        <slf4j.version>1.6.4</slf4j.version>
 	</properties>
 
 	<dependencies>
@@ -36,12 +37,6 @@
 			</exclusions>
 		</dependency>
         <dependency>
-            <groupId>commons-codec</groupId>
-            <artifactId>commons-codec</artifactId>
-            <version>1.7</version>
-        </dependency>
-
-        <dependency>
 			<groupId>org.mortbay.jetty</groupId>
 			<artifactId>jetty</artifactId>
 			<version>6.1.14</version>
@@ -62,7 +57,19 @@
 			<type>jar</type>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
+        <dependency>
+            <groupId>javax.servlet.jsp</groupId>
+            <artifactId>jsp-api</artifactId>
+            <version>2.1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>jstl</artifactId>
+            <version>1.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
 			<groupId>net.sourceforge.jwebunit</groupId>
 			<artifactId>jwebunit-core</artifactId>
 			<version>2.5</version>
@@ -73,10 +80,36 @@
 			<artifactId>jwebunit-htmlunit-plugin</artifactId>
 			<version>2.5</version>
 			<scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>ch.qos.logback</groupId>
+                    <artifactId>logback-classic</artifactId>
+                </exclusion>
+            </exclusions>
 		</dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>${slf4j.version}</version>
+            <scope>test</scope>
+        </dependency>
 
 
-		<!-- Spring Core, in order to exclude Logging once -->
+        <!-- ********************************************* -->
+        <!-- **** Runtime dependencies   (Non test)   **** -->
+        <!-- ********************************************* -->
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+            <version>2.5</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+            <version>1.7</version>
+        </dependency>
+        <!-- Spring Core, in order to exclude commons-logging once -->
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-core</artifactId>
@@ -88,11 +121,6 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-
-		<!-- ********************************************* -->
-		<!-- **** Web Stuff **** -->
-		<!-- ********************************************* -->
-		<!-- Spring MVC -->
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-webmvc</artifactId>
@@ -103,37 +131,12 @@
 			<artifactId>jackson-mapper-asl</artifactId>
 			<version>1.9.4</version>
 		</dependency>
-
-		<!-- Logging -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>jcl-over-slf4j</artifactId>
-			<version>1.6.4</version>
-		</dependency>
-		<dependency>
-			<groupId>ch.qos.logback</groupId>
-			<artifactId>logback-classic</artifactId>
-			<version>1.0.0</version>
+			<version>${slf4j.version}</version>
 		</dependency>
 
-		<!-- Servlet -->
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>servlet-api</artifactId>
-			<version>2.5</version>
-			<scope>provided</scope>
-		</dependency>
-		 <dependency>
-		 <groupId>javax.servlet.jsp</groupId>
-		 <artifactId>jsp-api</artifactId>
-		 <version>2.1</version>
-		 <scope>provided</scope>
-		 </dependency>
-		 <dependency>
-		 <groupId>javax.servlet</groupId>
-		 <artifactId>jstl</artifactId>
-		 <version>1.2</version>
-		 </dependency>
 	</dependencies>
 
 

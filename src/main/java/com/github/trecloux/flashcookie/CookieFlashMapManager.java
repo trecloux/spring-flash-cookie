@@ -1,4 +1,4 @@
-package com.github.trecloux.flashcookie.web;
+package com.github.trecloux.flashcookie;
 
 import org.apache.commons.codec.binary.Base64;
 import org.codehaus.jackson.map.ObjectMapper;

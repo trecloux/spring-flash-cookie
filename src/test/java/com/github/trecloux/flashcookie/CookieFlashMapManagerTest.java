@@ -1,12 +1,12 @@
-package com.github.trecloux.flashcookie.web;
+package com.github.trecloux.flashcookie;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.Test;
+import org.springframework.web.servlet.FlashMap;
 
 import java.util.Collections;
 import java.util.List;
 
-import org.junit.Test;
-import org.springframework.web.servlet.FlashMap;
+import static org.junit.Assert.assertEquals;
 
 public class CookieFlashMapManagerTest {
 	

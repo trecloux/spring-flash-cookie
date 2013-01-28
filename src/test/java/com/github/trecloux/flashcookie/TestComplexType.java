@@ -1,4 +1,4 @@
-package com.github.trecloux.flashcookie.web;
+package com.github.trecloux.flashcookie;
 
 public class TestComplexType {
 	String str;

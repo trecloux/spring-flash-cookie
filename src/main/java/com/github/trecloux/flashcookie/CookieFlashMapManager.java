@@ -1,10 +1,12 @@
 package com.github.trecloux.flashcookie;
 
-import org.apache.commons.codec.binary.Base64;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.ObjectMapper.DefaultTyping;
+import org.jasypt.util.text.BasicTextEncryptor;
+import org.jasypt.util.text.TextEncryptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.web.servlet.FlashMap;
 import org.springframework.web.servlet.support.AbstractFlashMapManager;
 import org.springframework.web.util.WebUtils;
@@ -25,22 +27,34 @@ import java.util.Map;
  * 
  * @author Thomas Recloux
  */
-public class CookieFlashMapManager extends AbstractFlashMapManager {
+public class CookieFlashMapManager extends AbstractFlashMapManager implements InitializingBean {
 
 	private static final String COOKIE_NAME = "FLASH";
 	private static final String MAP_ATTR = "map";
 	private static final String REQUEST_PATH_ATTR = "targetRequestPath";
-	private static final String ENCODING = "UTF-8";
 
 	private ObjectMapper objectMapper = new ObjectMapper();
-	
+    private TextEncryptor encryptor = new BasicTextEncryptor();
+
 	private Logger logger = LoggerFactory.getLogger(getClass());
 
-	public CookieFlashMapManager() {
-		objectMapper.enableDefaultTyping(DefaultTyping.NON_FINAL);
-	}
+    public CookieFlashMapManager(String encryptorPassword) {
+        BasicTextEncryptor basicTextEncryptor = new BasicTextEncryptor();
+        basicTextEncryptor.setPassword(encryptorPassword);
+        this.encryptor = basicTextEncryptor;
+    }
 
-	@Override
+    public CookieFlashMapManager(TextEncryptor encryptor) {
+        this.encryptor = encryptor;
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        objectMapper.enableDefaultTyping(DefaultTyping.NON_FINAL);
+    }
+
+
+    @Override
 	protected List<FlashMap> retrieveFlashMaps(HttpServletRequest request) {
 		Cookie cookie = WebUtils.getCookie(request, COOKIE_NAME);
 		if (cookie == null) {
@@ -52,11 +66,10 @@ public class CookieFlashMapManager extends AbstractFlashMapManager {
 	}
 
 	@SuppressWarnings("unchecked")
-	protected List<FlashMap> decodeFlashMaps(String base64EncodedValue) {
+	protected List<FlashMap> decodeFlashMaps(String encryptedValue) {
 		try {
-			byte[] data = Base64.decodeBase64(base64EncodedValue);
-			String stringEncodedValue = new String(data, ENCODING);
-			List<Map<String, Object>> maps = objectMapper.readValue(stringEncodedValue, List.class);
+			String decryptedJson = decrypt(encryptedValue);
+			List<Map<String, Object>> maps = objectMapper.readValue(decryptedJson, List.class);
 			List<FlashMap> flashMaps = rebuildFlashMap(maps);
 			return flashMaps;
 		} catch (IOException e) {
@@ -64,7 +77,8 @@ public class CookieFlashMapManager extends AbstractFlashMapManager {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
+
+    @SuppressWarnings("unchecked")
 	private List<FlashMap> rebuildFlashMap(List<Map<String, Object>> maps) {
 		List<FlashMap> flashMaps = new ArrayList<FlashMap>();
 		for (Map<String, Object> map : maps) {
@@ -85,20 +99,19 @@ public class CookieFlashMapManager extends AbstractFlashMapManager {
 
 	protected String encodeFlashMaps(List<FlashMap> flashMaps) {
 		try {
-			
 			List<Map<String, Object>> disassembledFlashMaps = disassembleFlashMaps(flashMaps);
-			String encodedValue = objectMapper.writeValueAsString(disassembledFlashMaps);
-			logger.trace("JSon encoded FlashMap : {}", encodedValue);
-			byte[] data = encodedValue.getBytes(ENCODING);
-			String base64Encoded = Base64.encodeBase64String(data);
-			logger.trace("Base64 encoded FlashMap size : {}", base64Encoded.length());
-			return base64Encoded;
+			String jsonValue = objectMapper.writeValueAsString(disassembledFlashMaps);
+			logger.trace("JSon encoded FlashMap : {}", jsonValue);
+            String encryptedValue = encrypt(jsonValue);
+			logger.trace("Base64 encoded FlashMap size : {}", encryptedValue);
+			return encryptedValue;
 		} catch (IOException e) {
 			throw new RuntimeException("Error encoding flash map", e);
 		}
 	}
 
-	private List<Map<String, Object>> disassembleFlashMaps(List<FlashMap> flashMaps) {
+
+    private List<Map<String, Object>> disassembleFlashMaps(List<FlashMap> flashMaps) {
 		List<Map<String,Object>> disassembledFlashMaps = new ArrayList<Map<String,Object>>();
 		for (FlashMap flashMap : flashMaps) {
 			Map<String,Object> disassembledFlashMap = new HashMap<String, Object>();
@@ -108,4 +121,12 @@ public class CookieFlashMapManager extends AbstractFlashMapManager {
 		}
 		return disassembledFlashMaps;
 	}
+
+    private String encrypt(String message) {
+        return encryptor.encrypt(message);
+    }
+
+    private String decrypt(String encryptedMessage) {
+        return encryptor.decrypt(encryptedMessage);
+    }
 }

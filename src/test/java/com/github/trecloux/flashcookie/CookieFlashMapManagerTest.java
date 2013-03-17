@@ -1,5 +1,6 @@
 package com.github.trecloux.flashcookie;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.springframework.web.servlet.FlashMap;
 
@@ -10,9 +11,15 @@ import static org.junit.Assert.assertEquals;
 
 public class CookieFlashMapManagerTest {
 	
-	CookieFlashMapManager cookieFlashMapManager = new CookieFlashMapManager();
+	CookieFlashMapManager cookieFlashMapManager;
 
-	@Test
+    @Before
+    public void setUp() throws Exception {
+        cookieFlashMapManager = new CookieFlashMapManager("myPassword");
+        cookieFlashMapManager.afterPropertiesSet();
+    }
+
+    @Test
 	public void shoudEncodeAndDecodeABasicFlashMap() throws Exception {
 		FlashMap flashMap = new FlashMap();
 		flashMap.setTargetRequestPath("/myuri");

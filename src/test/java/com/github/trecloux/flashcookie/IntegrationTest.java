@@ -41,7 +41,7 @@ public class IntegrationTest extends WebTester {
 	public void startServer() throws Exception {
 		server = new Server();
 		Connector connector = new SelectChannelConnector();
-		connector.setPort(8080);
+		connector.setPort(8888);
 		connector.setHost("0.0.0.0");
 		server.addConnector(connector);
 	 
@@ -53,6 +53,7 @@ public class IntegrationTest extends WebTester {
 		server.setStopAtShutdown(true);
 
 		server.start();
+        setBaseUrl("http://localhost:8888");
 	}
 	
 	@After

@@ -7,6 +7,7 @@ import org.jasypt.util.text.TextEncryptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.FlashMap;
 import org.springframework.web.servlet.support.AbstractFlashMapManager;
 import org.springframework.web.util.WebUtils;
@@ -94,6 +95,11 @@ public class CookieFlashMapManager extends AbstractFlashMapManager implements In
 	protected void updateFlashMaps(List<FlashMap> flashMaps, HttpServletRequest request, HttpServletResponse response) {
 		String encodedValue = encodeFlashMaps(flashMaps);
 		Cookie cookie = new Cookie(COOKIE_NAME, encodedValue);
+        String contextPath = request.getContextPath();
+        if (StringUtils.isEmpty(contextPath)) {
+            contextPath = "/";
+        }
+        cookie.setPath(contextPath);
 		response.addCookie(cookie);
 	}
 
